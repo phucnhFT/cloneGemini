@@ -13,6 +13,7 @@ const Chat = () => {
   const [dataDetail, setDataDetail] = useState([]);
   const [messageDetail, setMessageDetail] = useState([]);
   const [inputChat, setInputChat] = useState("");
+  const [loading, setLoading] = useState(false); // Thêm state loading
   const { id } = useParams();
   const { data } = useSelector((state) => state.chat);
   const dispatch = useDispatch();
@@ -29,22 +30,26 @@ const Chat = () => {
 
   const handleChatDetail = async () => {
     if (id) {
+      setLoading(true); // Bật trạng thái loading
       const chatText = await Gemini(inputChat, messageDetail);
+
       if (dataDetail.title === "Chat") {
         const promptName = `This is a new chat, and user ask about ${inputChat}. No rely and comment just give me a name for this chat, Max length is 10 characters`;
         const newTitle = await Gemini(promptName);
         dispatch(setNameChat({ newTitle, chatId: id }));
       }
+
       if (chatText) {
         const dataMessage = {
           idChat: id,
           userMess: inputChat,
           botMess: chatText,
         };
-
         dispatch(addMessage(dataMessage));
         setInputChat("");
       }
+
+      setLoading(false); // Tắt trạng thái loading sau khi có phản hồi
     }
   };
 
@@ -108,6 +113,14 @@ const Chat = () => {
             </div>
           </div>
         )}
+
+        {/* Hiển thị loading khi đang chờ phản hồi */}
+        {loading && (
+          <div className="text-center">
+            <p className="animate-pulse text-green-500">Đang xử lý...</p>
+          </div>
+        )}
+
         <div className="flex items-center space-x-4 w-full">
           <input
             type="text"
@@ -115,12 +128,14 @@ const Chat = () => {
             placeholder="Nhập câu lệnh tại đây"
             className="p-4 rounded-lg bg-primaryBg-default w-[90%] border"
             onChange={(e) => setInputChat(e.target.value)}
+            disabled={loading} // Disable input khi loading
           />
           <button
             className="p-4 rounded-lg bg-green-500 text-white"
             onClick={handleChatDetail}
+            disabled={loading} // Disable nút khi loading
           >
-            Gửi
+            {loading ? "Đang gửi..." : "Gửi"} {/* Đổi text khi loading */}
           </button>
         </div>
       </div>
