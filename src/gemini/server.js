@@ -53,11 +53,11 @@ async function run(textInput, chatHistory) {
     /**
      * istory = (chatHistory || []).map(...): Nếu chatHistory là mảng hợp lệ.
      * nó sẽ được chuyển thành định dạng yêu cầu với role là user.
-     * hoặc model (tùy thuộc vào việc tin nhắn đến từ người dùng hay bot) và path là văn bản của tin nhắn.
+     * hoặc model (tùy thuộc vào việc tin nhắn đến từ người dùng hay bot) và parts là văn bản của tin nhắn.
      */
     return {
       role: item.isBot ? "model" : "user",
-      path: [{ text: item.text }],
+      parts: [{ text: item.text }],
     };
   });
   /**
